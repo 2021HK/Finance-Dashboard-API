@@ -1,9 +1,15 @@
-.vs/ 
-bin/ 
-obj/ 
-*.user 
-*.suo 
-*.user 
-obj/ 
-bin/ 
-.vs/ 
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# .NET build output
+bin/
+obj/
+
+# Local development configuration
+**/appsettings.Development.json
+
+# Local appsettings files
+**/appsettings.Local.json
+**/appsettings.*.local.json

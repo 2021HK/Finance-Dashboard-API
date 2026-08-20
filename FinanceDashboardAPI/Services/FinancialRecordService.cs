@@ -91,6 +91,7 @@ namespace FinanceDashboardAPI.Services
             record.Category = dto.Category;
             record.Date = dto.Date;
             record.Notes = dto.Notes;
+            record.UpdatedAt = DateTime.UtcNow;
 
             _repository.Update(record);
             

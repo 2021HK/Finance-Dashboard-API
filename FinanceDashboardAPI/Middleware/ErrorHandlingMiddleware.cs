@@ -1,69 +1,78 @@
-﻿using FinanceDashboardAPI.Middleware;
-using Microsoft.AspNetCore.Http;
-using System;
+﻿using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Text.Json;
-using System.Threading.Tasks;
-
 
 namespace FinanceDashboardAPI.Middleware
 {
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ErrorHandlingMiddleware> _logger;
 
-        public ErrorHandlingMiddleware(RequestDelegate next)
+        public ErrorHandlingMiddleware(
+            RequestDelegate next,
+            ILogger<ErrorHandlingMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
+
         public async Task InvokeAsync(HttpContext context)
         {
             try
             {
                 await _next(context);
-
             }
             catch (Exception ex)
             {
+                _logger.LogError(
+                    ex,
+                    "Unhandled exception occurred while processing {Method} {Path}",
+                    context.Request.Method,
+                    context.Request.Path);
+
                 await HandleExceptionAsync(context, ex);
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context , Exception exception)
+        private Task HandleExceptionAsync(
+            HttpContext context,
+            Exception exception)
         {
-            var statusCode = HttpStatusCode.InternalServerError;    
+            var statusCode = HttpStatusCode.InternalServerError;
 
-            var massage = "An unexpected error occurred";
+            var message = "An unexpected error occurred";
 
             switch (exception)
             {
                 case KeyNotFoundException:
                     statusCode = HttpStatusCode.NotFound;
-                    massage = exception.Message;
+                    message = exception.Message;
                     break;
 
                 case UnauthorizedAccessException:
                     statusCode = HttpStatusCode.Unauthorized;
-                    massage = exception.Message;
+                    message = exception.Message;
                     break;
 
                 case ArgumentException:
-                    case InvalidOperationException:
+                case InvalidOperationException:
                     statusCode = HttpStatusCode.BadRequest;
-                    massage = exception.Message;
+                    message = exception.Message;
                     break;
             }
 
             var response = new
             {
-                error = massage,
-                statusCode = (int)statusCode,
+                error = message,
+                statusCode = (int)statusCode
             };
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;
 
-            return context.Response.WriteAsync(JsonSerializer.Serialize(response));
+            return context.Response.WriteAsync(
+                JsonSerializer.Serialize(response));
         }
     }
 }

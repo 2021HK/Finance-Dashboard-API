@@ -18,15 +18,16 @@ namespace FinanceDashboardAPI.Models
         [MaxLength(10)]
         public string Type { get; set; } = string.Empty;
 
+
         [Required]
         [MaxLength(100)]
-        public string Category { get; set; }
+        public string Category { get; set; } = string.Empty;
 
         [Required]
         public DateTime Date { get; set; }
 
         [MaxLength(500)]
-        public string Notes { get; set; }
+        public string? Notes { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

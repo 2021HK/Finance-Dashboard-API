@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
 
 // Database context - PostgreSQL
 // Configure Npgsql to handle timestamp without time zone as UTC
@@ -31,8 +32,18 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // JWT Helper
 var jwtSecret = builder.Configuration["Jwt:Secret"];
-var jwtExpiryMinutes = int.Parse(builder.Configuration["Jwt:ExpiryMinutes"] ?? "60");
-builder.Services.AddSingleton(new JwtHelper(jwtSecret, jwtExpiryMinutes));
+
+if (string.IsNullOrWhiteSpace(jwtSecret))
+{
+    throw new InvalidOperationException(
+        "JWT secret is not configured. Set 'Jwt:Secret' in configuration or environment variables.");
+}
+
+var jwtExpiryMinutes = int.Parse(
+    builder.Configuration["Jwt:ExpiryMinutes"] ?? "60");
+
+builder.Services.AddSingleton(
+    new JwtHelper(jwtSecret, jwtExpiryMinutes));
 
 // Authentication and Authorization
 builder.Services.AddAuthentication(options =>
@@ -112,5 +123,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHealthChecks("/health");
 
 app.Run();

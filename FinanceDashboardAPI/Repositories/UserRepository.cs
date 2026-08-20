@@ -17,12 +17,12 @@ namespace FinanceDashboardAPI.Repositories
             return _context.Users.ToList();
         }
 
-        public User GetById(int id)
+        public User? GetById(int id)
         {
             return _context.Users.Find(id);
         }
 
-        public User GetByUsername(string username)
+        public User? GetByUsername(string username)
         {
             return _context.Users.FirstOrDefault(u => u.Username == username);
         }

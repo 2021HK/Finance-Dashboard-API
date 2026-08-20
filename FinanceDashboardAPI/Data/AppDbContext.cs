@@ -22,7 +22,7 @@ namespace FinanceDashboardAPI.Data
             {
                 entity.HasKey(e => e.Id);
                 entity.HasIndex(e => e.Username).IsUnique();
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()"); 
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP"); 
             });
 
             // FinancialRecord configuration
@@ -34,7 +34,7 @@ namespace FinanceDashboardAPI.Data
                 entity.HasIndex(e => e.IsDeleted);
 
                 entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
-                entity.Property(e => e.CreatedAt).HasDefaultValueSql("GETUTCDATE()");
+                entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
                 entity.Property(e => e.IsDeleted).HasDefaultValue(false);
 
                 // Foreign key relationship
